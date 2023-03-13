@@ -1,9 +1,10 @@
-#define unit_delay 250
-#define speaker 8
+#define unit_delay 250 //How long a beep goes for in Milliseconds. Change if desired. This also affects how long a dash goes for, and it also affects the pauses between letters, elements and words.
+#define speaker 8 //GPIO pin for speaker, change to different one if desired.
 
 //International morse code theory:
+//Dot length = unit_delay
 //Dash length = unit_delay*3
-//Pause between elements = unit_delay
+//Pause between elements (.'s and -'s) = unit_delay
 //Pause between letters = unit_delay*3
 //Pause between words = unit_delay*7
 
@@ -12,18 +13,18 @@ constexpr char alpha_nocap[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'
 constexpr char alpha_cap[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}; // Array of capitalized letters
 constexpr char numbers[] = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}; // Array of numbers.
 char morse_alpha[] = {'.', '-'}; // array of dots and dashes. 0 = *, 1 = -.
-String code = "";
-int len = 0; //length
-char character; //
+String code = ""; //This stores the inputted text.
+int len = 0; //Length of the inputted text, set to zero.
+char character; // Currect character.
 int sel_array; // This selects the array. 1 for the non capitalized letters, 2 for the capitalized letters, 3 for the numbers.
 int array_char; // This selects the part of the array.
 int testfunction; // Tests further processing data from the specified part of the array
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);// initialize LED
-    pinMode(speaker, OUTPUT);// initialize speaker
-  Serial.begin(115200);
-  Serial.println("Messenger ready. Type a message to be translated to morse code.");
+  pinMode(speaker, OUTPUT);// initialize the speaker speaker
+  Serial.begin(115200); //Start the serial terminal
+  Serial.println("Messenger ready. Type a message to be translated to morse code."); //Tells the user it is ready to translate the text.
 }
 
 void m_dot() { // Function for dot, mainly for optimization
@@ -43,7 +44,7 @@ void m_dash() { //Function for dash, mainly for optimization.
 void off(int offtime) { //Turns LED Off for a specified time (in the brackets.)
   digitalWrite(LED_BUILTIN, LOW); //turn the LED off
   digitalWrite(speaker, LOW); //turn the speaker off
-  delay(offtime);
+  delay(offtime); //Delay for offtime
 }
 
 void rosetta_stone() { // Basically a massive switch statement that goes through the arrays to find the text.
@@ -58,7 +59,7 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
       break; //end the statement and go back.
     case alpha_cap[1]: // If the character was B
     case alpha_nocap[1]: // Or its lower case equivalence
-      m_dash();
+      m_dash(); //Dash
       off(unit_delay);
       m_dot();
       off(unit_delay);
@@ -70,11 +71,11 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
       break;// End the statement.
     case alpha_cap[2]: //If the letter is C
     case alpha_nocap[2]: //Or its lower case equivalent
-      m_dash();
+      m_dash(); //Dash
       off(unit_delay);
       m_dot();
       off(unit_delay);
-      m_dash();
+      m_dash(); //Dash
       off(unit_delay);
       m_dot();
       Serial.print(" "); // Gap in serial terminal for readability
@@ -82,7 +83,7 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
       break;// End the statement
     case alpha_cap[3]: //If the letter is D
     case alpha_nocap[3]: // Or its lower case equivalent
-      m_dash();
+      m_dash(); //Dash
       off(unit_delay);
       m_dot();
       off(unit_delay);
@@ -445,11 +446,243 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
       Serial.print(" "); // Gap in serial terminal for readability
       off(unit_delay * 3);
       break;
-    case ' ':
+    case ' ': //If a space is detected
       Serial.print(" / "); // This symbolizes a space
       delay(unit_delay * 7); // Between Words, there has to be a morse code delay of the unit_delay*7.
       break;
+    case '!': //if a exclamation mark is detected
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
+
+    case '&'://If an ampersand is detected
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
+
+    case '\'': //If a ' is detected
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '@':
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case ')':
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '(':
+        m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case ':':
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+        case ',':
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '=':
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '.':
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+        m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+        m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '-':
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+    
+    case '+':
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '\"':
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '/':
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+    case '?':
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dash();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay);
+    m_dot();
+    off(unit_delay*3);
+    Serial.print(" "); // Gap in serial terminal for readability
+    break;
+
+
   }
+
 
 }
 
@@ -457,18 +690,18 @@ void text2morse() { // Cuts the sent text to the individual character, then ship
   len = code.length(); //Length variable to show how large the text is.
   for (int i = 0; i < len; i++) { //This statement goes through the characters of the text inputted.
     character = code.charAt(i); //This selects the current character
-    rosetta_stone(); // Calls the Rosetta stone, which translates the character to morse.
+    rosetta_stone(); // Calls the Rosetta stone, which translates the selected character to morse.
   }
 }
 
-void loop() {
-  while (Serial.available()) {
-    code = Serial.readString();
-    Serial.print(code);
-    Serial.print(" = ");
-    text2morse();
-    Serial.println("");
+void loop() { //Loop de loop
+  while (Serial.available()) { //While the serial port is available,
+    code = Serial.readString(); //Send the input to the code variable, which holds the input, ready to be processed by text2morse()
+    Serial.print(code); // Print the inputted text to terminal
+    Serial.print("= "); // Divide the text and translation
+    text2morse(); //Call text2morse(), which divvies up the code variable to individual characters, which get translated in the rosetta_stone() function.
+    Serial.println(""); //New line in the serial terminal for readability.
   }
-  delay(1000);
+  delay(1000); // Delay 1 second.
 
 }
