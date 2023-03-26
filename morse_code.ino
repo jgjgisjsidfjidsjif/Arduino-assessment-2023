@@ -1,5 +1,10 @@
 #define unit_delay 250 //How long a beep goes for in Milliseconds. Change if desired. This also affects how long a dash goes for, and it also affects the pauses between letters, elements and words.
-#define speaker 8 //GPIO pin for speaker, change to different one if desired.
+#define led_pin 11 //Pin For Gpio led. The positive pin connects to this pin. Make sure you use a resistor, otherwise the LED will burn
+#define speaker_pin 8 //Pin for the speaker. the + pin connects to this pin.
+///////CONFIGURATION
+bool speaker_Enabled = true; // This enables or disables the speaker
+bool led_Enabled = true; //This enables or disables the GPIO LED. For debugging purposes, the Built in LED is always enabled.
+//////END OF CONFIGURATION
 
 //International morse code theory:
 //Dot length = unit_delay
@@ -22,28 +27,54 @@ int testfunction; // Tests further processing data from the specified part of th
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);// initialize LED
-  pinMode(speaker, OUTPUT);// initialize the speaker speaker
+  pinMode(led_pin, OUTPUT);
+  pinMode(speaker_pin, OUTPUT);// initialize the speaker speaker
   Serial.begin(115200); //Start the serial terminal
   Serial.println("Messenger ready. Type a message to be translated to morse code."); //Tells the user it is ready to translate the text.
 }
 
+void speaker(bool speak) {
+  if (speaker_Enabled == true) {
+    if (speak == true) {
+      digitalWrite(speaker_pin, HIGH); //turn the speaker on
+    }
+    else {
+      digitalWrite(speaker_pin, LOW); //turn the speaker off
+    }
+  }
+}
+
+void light(bool on) {
+  if (led_Enabled == true) {
+    if (on == true) {
+      digitalWrite(led_pin, HIGH); // Turn GPIO Led on
+    }
+    else {
+      digitalWrite(led_pin, LOW); // Turn GPIO Led off
+    }
+  }
+
+}
+
 void m_dot() { // Function for dot, mainly for optimization
   Serial.print(morse_alpha[0]);//Print .
-  digitalWrite(LED_BUILTIN, HIGH); //turn the LED on
-  digitalWrite(speaker, HIGH); //turn the speaker on
+  speaker(true); //Turn on speaker (if enabled)
+  light(true); //Turn on GPIO Led (if enabled)
   delay(unit_delay);//wait unit_delay
 }
 
 void m_dash() { //Function for dash, mainly for optimization.
   Serial.print(morse_alpha[1]);//print -
-  digitalWrite(LED_BUILTIN, HIGH); //turn the LED on
-  digitalWrite(speaker, HIGH); //turn the speaker on
+  digitalWrite(LED_BUILTIN, HIGH); //turn the built in LED on for diagnostics purposes
+  speaker(true); //Turn on speaker (if enabled
+  light(true); //Turn on GPIO Led (if enabled)
   delay(unit_delay * 3); // Wait unit_delay*3, as a subsitute of - being held for 3 units.
 }
 
 void off(int offtime) { //Turns LED Off for a specified time (in the brackets.)
   digitalWrite(LED_BUILTIN, LOW); //turn the LED off
-  digitalWrite(speaker, LOW); //turn the speaker off
+  speaker(false); //Turn off speaker
+  light(false); //Turn off light
   delay(offtime); //Delay for offtime
 }
 
@@ -481,204 +512,204 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
       break;
 
     case '\'': //If a ' is detected
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '@':
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case ')':
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '(':
-        m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case ':':
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
-        case ',':
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+    case ',':
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '=':
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '.':
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-        m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-        m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '-':
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
-    
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
+
     case '+':
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '\"':
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '/':
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
     case '?':
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dash();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay);
-    m_dot();
-    off(unit_delay*3);
-    Serial.print(" "); // Gap in serial terminal for readability
-    break;
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dash();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay);
+      m_dot();
+      off(unit_delay * 3);
+      Serial.print(" "); // Gap in serial terminal for readability
+      break;
 
 
   }
