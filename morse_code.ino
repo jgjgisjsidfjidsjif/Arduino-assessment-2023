@@ -2,6 +2,7 @@
 #define led_pin 11 //Pin For Gpio led. The positive pin connects to this pin. Make sure you use a resistor, otherwise the LED will burn
 #define speaker_pin 8 //Pin for the speaker. the + pin connects to this pin.
 ///////CONFIGURATION
+#define speaker_frequency 988 //Speaker frequency in hz. This allows you to change the sound characteristics of the speaker
 bool speaker_Enabled = true; // This enables or disables the speaker
 bool led_Enabled = true; //This enables or disables the GPIO LED. For debugging purposes, the Built in LED is always enabled.
 //////END OF CONFIGURATION
@@ -36,10 +37,12 @@ void setup() {
 void speaker(bool speak) {
   if (speaker_Enabled == true) {
     if (speak == true) {
-      digitalWrite(speaker_pin, HIGH); //turn the speaker on
+      //digitalWrite(speaker_pin, HIGH); //turn the speaker on
+      tone(speaker_pin,speaker_frequency);
     }
     else {
-      digitalWrite(speaker_pin, LOW); //turn the speaker off
+      //digitalWrite(speaker_pin, LOW); //turn the speaker off
+      noTone(speaker_pin);
     }
   }
 }
