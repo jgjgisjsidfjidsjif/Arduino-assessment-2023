@@ -1,10 +1,10 @@
+///////CONFIGURATION
 #define unit_delay 250 //How long a beep goes for in Milliseconds. Change if desired. This also affects how long a dash goes for, and it also affects the pauses between letters, elements and words.
 #define led_pin 11 //Pin For Gpio led. The positive pin connects to this pin. Make sure you use a resistor, otherwise the LED will burn
 #define speaker_pin 8 //Pin for the speaker. the + pin connects to this pin.
-///////CONFIGURATION
 #define speaker_frequency 988 //Speaker frequency in hz. This allows you to change the sound characteristics of the speaker
-bool speaker_Enabled = true; // This enables or disables the speaker
-bool led_Enabled = true; //This enables or disables the GPIO LED. For debugging purposes, the Built in LED is always enabled.
+const bool speaker_Enabled = true; // This enables or disables the speaker
+const bool led_Enabled = true; //This enables or disables the GPIO LED. For debugging purposes, the Built in LED is always enabled.
 //////END OF CONFIGURATION
 
 //International morse code theory:
@@ -22,23 +22,22 @@ char morse_alpha[] = {'.', '-'}; // array of dots and dashes. 0 = *, 1 = -.
 String code = ""; //This stores the inputted text.
 int len = 0; //Length of the inputted text, set to zero.
 char character; // Currect character.
-int sel_array; // This selects the array. 1 for the non capitalized letters, 2 for the capitalized letters, 3 for the numbers.
-int array_char; // This selects the part of the array.
-int testfunction; // Tests further processing data from the specified part of the array
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);// initialize LED
   pinMode(led_pin, OUTPUT);
   pinMode(speaker_pin, OUTPUT);// initialize the speaker speaker
   Serial.begin(115200); //Start the serial terminal
-  Serial.println("Messenger ready. Type a message to be translated to morse code."); //Tells the user it is ready to translate the text.
+  Serial.println("Messenger ready. Type a message to be translated to morse code. Any unrecognized text will restart the messanger. Also a word count of 512 characters is present."); //Tells the user it is ready to translate the text.
 }
+
+void(* resetFunc) (void) = 0; // Resets the arduino in software. This is for clearing the variables in case a non latin, number, or punctuation is detected.
 
 void speaker(bool speak) {
   if (speaker_Enabled == true) {
     if (speak == true) {
       //digitalWrite(speaker_pin, HIGH); //turn the speaker on
-      tone(speaker_pin,speaker_frequency);
+      tone(speaker_pin, speaker_frequency);
     }
     else {
       //digitalWrite(speaker_pin, LOW); //turn the speaker off
@@ -128,6 +127,8 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
     case alpha_cap[4]: //If the letter is E
     case alpha_nocap[4]: // Or its lower case equivalent.
       m_dot();
+      Serial.print(" "); // Gap in serial terminal for readability
+
       off(unit_delay * 3);
       break;//End the statement
     case alpha_cap[5]:  //If the letter is F
@@ -714,16 +715,25 @@ void rosetta_stone() { // Basically a massive switch statement that goes through
       Serial.print(" "); // Gap in serial terminal for readability
       break;
 
-
+    default:
+      Serial.println("Unrecognied Character detected, please input the message without characters not recognized in International Morse code.");
+      delay(50);
+      resetFunc();
   }
 
 
 }
 
 void text2morse() { // Cuts the sent text to the individual character, then ships it off to the rosetta stone, which translate it to the morse code.
-  len = code.length(); //Length variable to show how large the text is.
+  len = code.length() - 1; //Length variable to show how large the text is.
   for (int i = 0; i < len; i++) { //This statement goes through the characters of the text inputted.
     character = code.charAt(i); //This selects the current character
+    if (!isAlphaNumeric(character) && !isWhitespace(character) && !ispunct(character)) { //Check if character is not a whitespace, alphanumeric, or punctuation
+      Serial.println("Unrecognied Character detected, please input the message without characters not recognized in International Morse code, like the characters below found in your message:");
+      Serial.println(character); // Print non-Latin, non-punctuation, non-numeric character
+      delay(100);
+      resetFunc(); //Resets the arduino
+    }
     rosetta_stone(); // Calls the Rosetta stone, which translates the selected character to morse.
   }
 }
@@ -731,6 +741,12 @@ void text2morse() { // Cuts the sent text to the individual character, then ship
 void loop() { //Loop de loop
   while (Serial.available()) { //While the serial port is available,
     code = Serial.readString(); //Send the input to the code variable, which holds the input, ready to be processed by text2morse()
+    len = code.length() - 1; //Length variable to show how large the text is.
+    if (len >= 513) { //If message is over 512 characters
+      Serial.println("Your message is too long. Long messages will break the program. Type a shorter message under 512 characters");
+      delay(50);
+      resetFunc();//Reset arduino.
+    }
     Serial.print(code); // Print the inputted text to terminal
     Serial.print("= "); // Divide the text and translation
     text2morse(); //Call text2morse(), which divvies up the code variable to individual characters, which get translated in the rosetta_stone() function.
