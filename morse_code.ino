@@ -746,7 +746,9 @@ void loop() { //Loop de loop
     code = Serial.readString(); //Send the input to the code variable, which holds the input, ready to be processed by text2morse()
     len = code.length() - 1; //Length variable to show how large the text is.
     if (len >= max_length + 1) { //If message has more characters than max_length allows
-      Serial.println("Your message is too long. Long messages will break the program. Type a shorter message under 512 characters");
+      Serial.println("Your message is too long. Long messages will break the program. Type a shorter message under ");
+      Serial.print(max_length);
+      Serial.print(" Characters");
       delay(50);
       resetFunc();//Reset arduino.
     }
