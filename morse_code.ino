@@ -3,6 +3,7 @@
 #define led_pin 11 //Pin For Gpio led. The positive pin connects to this pin. Make sure you use a resistor, otherwise the LED will burn
 #define speaker_pin 8 //Pin for the speaker. the + pin connects to this pin.
 #define speaker_frequency 988 //Speaker frequency in hz. This allows you to change the sound characteristics of the speaker
+#define max_length 512 //Maximum amount of characters for a message. The recommeneded maximum is 512 for the Arduino Uno, however, you can put this as a higher number if you have a more powerful microcontroller.
 const bool speaker_Enabled = true; // This enables or disables the speaker
 const bool led_Enabled = true; //This enables or disables the GPIO LED. For debugging purposes, the Built in LED is always enabled.
 //////END OF CONFIGURATION
@@ -28,7 +29,9 @@ void setup() {
   pinMode(led_pin, OUTPUT);
   pinMode(speaker_pin, OUTPUT);// initialize the speaker speaker
   Serial.begin(115200); //Start the serial terminal
-  Serial.println("Messenger ready. Type a message to be translated to morse code. Any unrecognized text will restart the messanger. Also a word count of 512 characters is present."); //Tells the user it is ready to translate the text.
+  Serial.println("Messenger ready. Type a message to be translated to morse code. Any unrecognized text will restart the messanger. Also a word count of "); //Tells the user it is ready to translate the text, and its limitations
+  Serial.print(max_length);
+  Serial.print(" characters is present.");
 }
 
 void(* resetFunc) (void) = 0; // Resets the arduino in software. This is for clearing the variables in case a non latin, number, or punctuation is detected.
@@ -742,7 +745,7 @@ void loop() { //Loop de loop
   while (Serial.available()) { //While the serial port is available,
     code = Serial.readString(); //Send the input to the code variable, which holds the input, ready to be processed by text2morse()
     len = code.length() - 1; //Length variable to show how large the text is.
-    if (len >= 513) { //If message is over 512 characters
+    if (len >= max_length + 1) { //If message has more characters than max_length allows
       Serial.println("Your message is too long. Long messages will break the program. Type a shorter message under 512 characters");
       delay(50);
       resetFunc();//Reset arduino.
